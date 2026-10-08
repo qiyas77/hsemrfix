@@ -440,7 +440,7 @@
       ],
       api: {
         googleScriptUrl: "https://script.google.com/macros/s/AKfycby2JrY-J9wFtoqd4RX1aXrpSMN6_CBy4mf5l-8M2OJQZV90712aLnMNO1COtRN19BUbZQ/exec",
-        recaptchaSiteKey: "6Le3VOUtAAAAAJANVQTr-0AAc1P3J4ja959g5gg_"
+        recaptchaSiteKey: "6Ld1-OQtAAAAAPi3vokGaWaKwLHG115-Ss4cDpIK"
       }
     };
 
@@ -555,60 +555,68 @@
     }
 
     function submitData() {
-      const spinner = document.getElementById('spinner');
+      var spinner = document.getElementById('spinner');
       spinner.classList.add('active');
 
-      if (!window.grecaptcha || !window.grecaptcha.ready) {
+      if (!window.grecaptcha) {
         spinner.classList.remove('active');
-        alert('reCAPTCHA не загрузился. Обновите страницу.');
+        alert('reCAPTCHA error. Refresh page.');
         return;
       }
 
       grecaptcha.ready(function() {
         grecaptcha.execute(CONFIG.api.recaptchaSiteKey, { action: 'submit' }).then(function(token) {
-          formData.secret = 'Pox6pedmtbH1LhMsuTqHq4VJU5HN5Mr6-yV2GLVoId2zIssiyCYUXg9OkJKRUstWzW7virRyL9ygctGdFEEHJA';
-          formData.recaptchaToken = token;
+          
+          var payload = {
+            firstName: formData.firstName,
+            lastName: formData.lastName,
+            company: formData.company,
+            department: formData.department,
+            lang: formData.lang,
+            secret: 'Pox6pedmtbH1LhMsuTqHq4VJU5HN5Mr6-yV2GLVoId2zIssiyCYUXg9OkJKRUstWzW7virRyL9ygctGdFEEHJA',
+            recaptchaToken: token
+          };
+
+          console.log('Sending payload:', payload);
 
           fetch(CONFIG.api.googleScriptUrl, {
             method: 'POST',
             headers: {
-              'Content-Type': 'application/json; charset=UTF-8',
-              'Accept': 'application/json, text/plain, */*'
+              'Content-Type': 'application/json'
             },
-            body: JSON.stringify(formData)
+            body: JSON.stringify(payload)
           })
           .then(function(response) {
+            console.log('Response status:', response.status);
             return response.text().then(function(text) {
-              let payload = null;
+              console.log('Response text:', text);
               try {
-                payload = text ? JSON.parse(text) : null;
+                return JSON.parse(text);
               } catch (e) {
-                payload = { success: response.ok, raw: text };
+                return { success: response.ok, raw: text };
               }
-              if (!response.ok) {
-                throw new Error(payload && payload.message ? payload.message : ('HTTP ' + response.status));
-              }
-              return payload;
             });
           })
           .then(function(result) {
+            console.log('Result:', result);
             spinner.classList.remove('active');
-            const success = result && (result.success === true || result.status === 'success' || result.ok === true || result.message === 'success');
-            if (success) {
+            
+            if (result.success === true) {
               showScreen('screenSuccess');
             } else {
-              alert('Ошибка при отправке данных. Проверьте Google Apps Script и доступ по URL.\n\n' + JSON.stringify(result));
+              alert('Ошибка: ' + (result.message || 'Unknown error'));
             }
           })
           .catch(function(err) {
             spinner.classList.remove('active');
-            console.error('submitData error:', err);
-            alert('Ошибка отправки в Google Sheet.\n' + (err && err.message ? err.message : 'Неизвестная ошибка'));
+            console.error('Error:', err);
+            alert('Ошибка сети: ' + err.message);
           });
+
         }).catch(function(err) {
           spinner.classList.remove('active');
           console.error('reCAPTCHA error:', err);
-          alert('reCAPTCHA не удалось выполнить. Обновите страницу.\n' + (err && err.message ? err.message : ''));
+          alert('reCAPTCHA error: ' + err.message);
         });
       });
     }
