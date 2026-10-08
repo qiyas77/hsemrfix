@@ -355,12 +355,10 @@
 
   <div class="app-wrapper">
 
-    <!-- SCREEN 1: Language -->
     <div class="screen active" id="screenLang">
       <div class="flag-list" id="flagList"></div>
     </div>
 
-    <!-- SCREEN 2: Form -->
     <div class="screen" id="screenForm">
       <div class="soft-card">
         <div class="form-hero">
@@ -396,7 +394,6 @@
       </div>
     </div>
 
-    <!-- SCREEN 3: HSE -->
     <div class="screen" id="screenHSE">
       <div class="soft-card">
         <div class="hse-header">
@@ -415,7 +412,6 @@
       </div>
     </div>
 
-    <!-- SCREEN 4: Success -->
     <div class="screen" id="screenSuccess">
       <div class="soft-card">
         <div class="success-wrap">
@@ -435,79 +431,12 @@
   </div>
 
   <script>
-    // ═══════════════════════════════════════════════════════════════
-    //  CONFIG — языки и пути к плакатам
-    // ═══════════════════════════════════════════════════════════════
     const CONFIG = {
       languages: [
-        {
-          code: "az",
-          name: "Azərbaycan",
-          flag: "https://flagcdn.com/w640/az.png",
-          instructions: [
-            "assets/instructions/az/01-scan.jpg",
-            "assets/instructions/az/02-registration.jpg",
-            "assets/instructions/az/03-ppe.jpg",
-            "assets/instructions/az/04-ppe-usage.jpg",
-            "assets/instructions/az/05-walkways.jpg",
-            "assets/instructions/az/06-vehicles.jpg",
-            "assets/instructions/az/07-hazardous.jpg",
-            "assets/instructions/az/08-prohibitions.jpg",
-            "assets/instructions/az/09-assembly.jpg",
-            "assets/instructions/az/10-smoking.jpg"
-          ]
-        },
-        {
-          code: "tr",
-          name: "Türkçe",
-          flag: "https://flagcdn.com/w640/tr.png",
-          instructions: [
-            "assets/instructions/tr/01-scan.jpg",
-            "assets/instructions/tr/02-registration.jpg",
-            "assets/instructions/tr/03-ppe.jpg",
-            "assets/instructions/tr/04-ppe-usage.jpg",
-            "assets/instructions/tr/05-walkways.jpg",
-            "assets/instructions/tr/06-vehicles.jpg",
-            "assets/instructions/tr/07-hazardous.jpg",
-            "assets/instructions/tr/08-prohibitions.jpg",
-            "assets/instructions/tr/09-assembly.jpg",
-            "assets/instructions/tr/10-smoking.jpg"
-          ]
-        },
-        {
-          code: "ru",
-          name: "Русский",
-          flag: "https://flagcdn.com/w640/ru.png",
-          instructions: [
-            "assets/instructions/ru/01-scan.jpg",
-            "assets/instructions/ru/02-registration.jpg",
-            "assets/instructions/ru/03-ppe.jpg",
-            "assets/instructions/ru/04-ppe-usage.jpg",
-            "assets/instructions/ru/05-walkways.jpg",
-            "assets/instructions/ru/06-vehicles.jpg",
-            "assets/instructions/ru/07-hazardous.jpg",
-            "assets/instructions/ru/08-prohibitions.jpg",
-            "assets/instructions/ru/09-assembly.jpg",
-            "assets/instructions/ru/10-smoking.jpg"
-          ]
-        },
-        {
-          code: "en",
-          name: "English",
-          flag: "https://flagcdn.com/w640/gb.png",
-          instructions: [
-            "assets/instructions/en/01-scan.jpg",
-            "assets/instructions/en/02-registration.jpg",
-            "assets/instructions/en/03-ppe.jpg",
-            "assets/instructions/en/04-ppe-usage.jpg",
-            "assets/instructions/en/05-walkways.jpg",
-            "assets/instructions/en/06-vehicles.jpg",
-            "assets/instructions/en/07-hazardous.jpg",
-            "assets/instructions/en/08-prohibitions.jpg",
-            "assets/instructions/en/09-assembly.jpg",
-            "assets/instructions/en/10-smoking.jpg"
-          ]
-        }
+        { code: "az", name: "Azərbaycan", flag: "https://flagcdn.com/w640/az.png", instructions: ["assets/instructions/az/01-scan.jpg","assets/instructions/az/02-registration.jpg","assets/instructions/az/03-ppe.jpg","assets/instructions/az/04-ppe-usage.jpg","assets/instructions/az/05-walkways.jpg","assets/instructions/az/06-vehicles.jpg","assets/instructions/az/07-hazardous.jpg","assets/instructions/az/08-prohibitions.jpg","assets/instructions/az/09-assembly.jpg","assets/instructions/az/10-smoking.jpg"] },
+        { code: "tr", name: "Türkçe", flag: "https://flagcdn.com/w640/tr.png", instructions: ["assets/instructions/tr/01-scan.jpg","assets/instructions/tr/02-registration.jpg","assets/instructions/tr/03-ppe.jpg","assets/instructions/tr/04-ppe-usage.jpg","assets/instructions/tr/05-walkways.jpg","assets/instructions/tr/06-vehicles.jpg","assets/instructions/tr/07-hazardous.jpg","assets/instructions/tr/08-prohibitions.jpg","assets/instructions/tr/09-assembly.jpg","assets/instructions/tr/10-smoking.jpg"] },
+        { code: "ru", name: "Русский", flag: "https://flagcdn.com/w640/ru.png", instructions: ["assets/instructions/ru/01-scan.jpg","assets/instructions/ru/02-registration.jpg","assets/instructions/ru/03-ppe.jpg","assets/instructions/ru/04-ppe-usage.jpg","assets/instructions/ru/05-walkways.jpg","assets/instructions/ru/06-vehicles.jpg","assets/instructions/ru/07-hazardous.jpg","assets/instructions/ru/08-prohibitions.jpg","assets/instructions/ru/09-assembly.jpg","assets/instructions/ru/10-smoking.jpg"] },
+        { code: "en", name: "English", flag: "https://flagcdn.com/w640/gb.png", instructions: ["assets/instructions/en/01-scan.jpg","assets/instructions/en/02-registration.jpg","assets/instructions/en/03-ppe.jpg","assets/instructions/en/04-ppe-usage.jpg","assets/instructions/en/05-walkways.jpg","assets/instructions/en/06-vehicles.jpg","assets/instructions/en/07-hazardous.jpg","assets/instructions/en/08-prohibitions.jpg","assets/instructions/en/09-assembly.jpg","assets/instructions/en/10-smoking.jpg"] }
       ],
       api: {
         googleScriptUrl: "https://script.google.com/macros/s/AKfycby2JrY-J9wFtoqd4RX1aXrpSMN6_CBy4mf5l-8M2OJQZV90712aLnMNO1COtRN19BUbZQ/exec",
@@ -515,63 +444,17 @@
       }
     };
 
-    // ═══════════════════════════════════════════════════════════════
-    //  I18N
-    // ═══════════════════════════════════════════════════════════════
     const i18n = {
-      AZ: {
-        formTitle: "Ziyarətçi qeydiyyatı", formSubtitle: "Bütün sahələri doldurun",
-        lblFirstName: "Ad", lblLastName: "Soyad", lblCompany: "Şirkət", lblDepartment: "Hansı departamentə gəlib",
-        btnContinue: "Davam et", btnBackLang: "← Dil seçiminə qayıt",
-        hseTitle: "Təhlükəsizlik təlimatı", hseSubtitle: "Girməzdən əvvəl qaydalarla tanış olun",
-        lblHseCheck: "Təhlükəsizlik qaydaları ilə tanış oldum və onlara riayət etməyə öhdəlik götürürəm",
-        btnConfirm: "Qeydiyyatı təsdiqlə", btnBackForm: "← Formaya qayıt",
-        successTitle: "Qeydiyyat tamamlandı!",
-        btnNewReg: "Yeni qeydiyyat", spinner: "Saxlanılır...",
-        errRequired: "Bu sahə mütləqdir", errMinLength: "Minimum 2 simvol"
-      },
-      TR: {
-        formTitle: "Ziyaretçi Kaydı", formSubtitle: "Tüm alanları doldurun",
-        lblFirstName: "Ad", lblLastName: "Soyad", lblCompany: "Şirket", lblDepartment: "Hangi departmana gelindi",
-        btnContinue: "Devam et", btnBackLang: "← Dil seçimine dön",
-        hseTitle: "Güvenlik talimatı", hseSubtitle: "Giriş yapmadan önce kuralları okuyun",
-        lblHseCheck: "Güvenlik kurallarını okudum ve bunlara uymayı taahhüt ediyorum",
-        btnConfirm: "Kaydı onayla", btnBackForm: "← Forma dön",
-        successTitle: "Kayıt tamamlandı!",
-        btnNewReg: "Yeni kayıt", spinner: "Kaydediliyor...",
-        errRequired: "Bu alan zorunludur", errMinLength: "Minimum 2 karakter"
-      },
-      RU: {
-        formTitle: "Регистрация посетителя", formSubtitle: "Заполните все поля",
-        lblFirstName: "Имя", lblLastName: "Фамилия", lblCompany: "Компания", lblDepartment: "К какому департаменту пришёл посетитель",
-        btnContinue: "Продолжить", btnBackLang: "← Назад к выбору языка",
-        hseTitle: "Инструктаж по безопасности", hseSubtitle: "Ознакомьтесь с правилами перед входом",
-        lblHseCheck: "Я ознакомлен(а) с правилами безопасности и обязуюсь их соблюдать",
-        btnConfirm: "Подтвердить регистрацию", btnBackForm: "← Назад к форме",
-        successTitle: "Регистрация завершена!",
-        btnNewReg: "Новая регистрация", spinner: "Сохранение...",
-        errRequired: "Обязательное поле", errMinLength: "Минимум 2 символа"
-      },
-      EN: {
-        formTitle: "Visitor Registration", formSubtitle: "Please fill in all fields",
-        lblFirstName: "First Name", lblLastName: "Last Name", lblCompany: "Company", lblDepartment: "Department being visited",
-        btnContinue: "Continue", btnBackLang: "← Back to language selection",
-        hseTitle: "Safety Briefing", hseSubtitle: "Please read the rules before entering",
-        lblHseCheck: "I have read and agree to comply with the safety rules",
-        btnConfirm: "Confirm Registration", btnBackForm: "← Back to form",
-        successTitle: "Registration completed!",
-        btnNewReg: "New Registration", spinner: "Saving...",
-        errRequired: "This field is required", errMinLength: "Minimum 2 characters"
-      }
+      AZ: { formTitle: "Ziyarətçi qeydiyyatı", formSubtitle: "Bütün sahələri doldurun", lblFirstName: "Ad", lblLastName: "Soyad", lblCompany: "Şirkət", lblDepartment: "Hansı departamentə gəlib", btnContinue: "Davam et", btnBackLang: "← Dil seçiminə qayıt", hseTitle: "Təhlükəsizlik təlimatı", hseSubtitle: "Girməzdən əvvəl qaydalarla tanış olun", lblHseCheck: "Təhlükəsizlik qaydaları ilə tanış oldum və onlara riayət etməyə öhdəlik götürürəm", btnConfirm: "Qeydiyyatı təsdiqlə", btnBackForm: "← Formaya qayıt", successTitle: "Qeydiyyat tamamlandı!", btnNewReg: "Yeni qeydiyyat", spinner: "Saxlanılır...", errRequired: "Bu sahə mütləqdir", errMinLength: "Minimum 2 simvol" },
+      TR: { formTitle: "Ziyaretçi Kaydı", formSubtitle: "Tüm alanları doldurun", lblFirstName: "Ad", lblLastName: "Soyad", lblCompany: "Şirket", lblDepartment: "Hangi departmana gelindi", btnContinue: "Devam et", btnBackLang: "← Dil seçimine dön", hseTitle: "Güvenlik talimatı", hseSubtitle: "Giriş yapmadan önce kuralları okuyun", lblHseCheck: "Güvenlik kurallarını okudum ve bunlara uymayı taahhüt ediyorum", btnConfirm: "Kaydı onayla", btnBackForm: "← Forma dön", successTitle: "Kayıt tamamlandı!", btnNewReg: "Yeni kayıt", spinner: "Kaydediliyor...", errRequired: "Bu alan zorunludur", errMinLength: "Minimum 2 karakter" },
+      RU: { formTitle: "Регистрация посетителя", formSubtitle: "Заполните все поля", lblFirstName: "Имя", lblLastName: "Фамилия", lblCompany: "Компания", lblDepartment: "К какому департаменту пришёл посетитель", btnContinue: "Продолжить", btnBackLang: "← Назад к выбору языка", hseTitle: "Инструктаж по безопасности", hseSubtitle: "Ознакомьтесь с правилами перед входом", lblHseCheck: "Я ознакомлен(а) с правилами безопасности и обязуюсь их соблюдать", btnConfirm: "Подтвердить регистрацию", btnBackForm: "← Назад к форме", successTitle: "Регистрация завершена!", btnNewReg: "Новая регистрация", spinner: "Сохранение...", errRequired: "Обязательное поле", errMinLength: "Минимум 2 символа" },
+      EN: { formTitle: "Visitor Registration", formSubtitle: "Please fill in all fields", lblFirstName: "First Name", lblLastName: "Last Name", lblCompany: "Company", lblDepartment: "Department being visited", btnContinue: "Continue", btnBackLang: "← Back to language selection", hseTitle: "Safety Briefing", hseSubtitle: "Please read the rules before entering", lblHseCheck: "I have read and agree to comply with the safety rules", btnConfirm: "Confirm Registration", btnBackForm: "← Back to form", successTitle: "Registration completed!", btnNewReg: "New Registration", spinner: "Saving...", errRequired: "This field is required", errMinLength: "Minimum 2 characters" }
     };
 
     let currentLang = 'RU';
     let currentLangConfig = null;
     let formData = {};
 
-    // ═══════════════════════════════════════════════════════════════
-    //  INIT
-    // ═══════════════════════════════════════════════════════════════
     function init() {
       const flagList = document.getElementById('flagList');
       flagList.innerHTML = '';
@@ -594,7 +477,7 @@
 
     function applyLang() {
       const t = i18n[currentLang];
-      const ids = ['formTitle','formSubtitle','lblFirstName','lblLastName','lblCompany','lblDepartment','btnContinue','btnBackLang','hseTitle','hseSubtitle','lblHseCheck','btnConfirm','btnBackForm','successTitle','btnNewReg','spinnerText'];
+      const ids = ['formTitle','formSubtitle','lblFirstName','lblLastName','lblCompany','lblDepartment','btnContinue','btnBackLang','hseTitle','hseSubtitle','lblHseCheck','btnConfirm','btnBackForm','successTitle','btnNewReg'];
       ids.forEach(function(id) {
         const el = document.getElementById(id);
         if (el) el.textContent = t[id];
@@ -631,10 +514,8 @@
 
       if (!firstName) { showError('firstName', t.errRequired); valid = false; }
       else if (firstName.length < 2) { showError('firstName', t.errMinLength); valid = false; }
-
       if (!lastName) { showError('lastName', t.errRequired); valid = false; }
       else if (lastName.length < 2) { showError('lastName', t.errMinLength); valid = false; }
-
       if (!company) { showError('company', t.errRequired); valid = false; }
       if (!department) { showError('department', t.errRequired); valid = false; }
 
@@ -642,7 +523,6 @@
 
       formData = { firstName: firstName, lastName: lastName, company: company, department: department, lang: currentLang };
 
-      // Build HSE gallery
       const hseContent = document.getElementById('hseContent');
       hseContent.innerHTML = '';
       if (currentLangConfig && currentLangConfig.instructions) {
@@ -654,7 +534,7 @@
           img.src = src;
           img.alt = 'HSE Step ' + num;
           img.onerror = function() {
-            card.innerHTML = '<div class="hse-img-error">⚠️ Şəkil tapılmadı / Изображение не найдено<br><small>' + src + '</small></div>';
+            card.innerHTML = '<div class="hse-img-error">⚠️ Изображение не найдено<br><small>' + src + '</small></div>';
           };
           const badge = document.createElement('div');
           badge.className = 'hse-step-badge';
@@ -675,35 +555,60 @@
     }
 
     function submitData() {
-      document.getElementById('spinner').classList.add('active');
+      const spinner = document.getElementById('spinner');
+      spinner.classList.add('active');
+
+      if (!window.grecaptcha || !window.grecaptcha.ready) {
+        spinner.classList.remove('active');
+        alert('reCAPTCHA не загрузился. Обновите страницу.');
+        return;
+      }
 
       grecaptcha.ready(function() {
-        grecaptcha.execute(CONFIG.api.recaptchaSiteKey, {action: 'submit'}).then(function(token) {
-
+        grecaptcha.execute(CONFIG.api.recaptchaSiteKey, { action: 'submit' }).then(function(token) {
           formData.secret = 'Pox6pedmtbH1LhMsuTqHq4VJU5HN5Mr6-yV2GLVoId2zIssiyCYUXg9OkJKRUstWzW7virRyL9ygctGdFEEHJA';
           formData.recaptchaToken = token;
 
           fetch(CONFIG.api.googleScriptUrl, {
             method: 'POST',
+            headers: {
+              'Content-Type': 'application/json; charset=UTF-8',
+              'Accept': 'application/json, text/plain, */*'
+            },
             body: JSON.stringify(formData)
           })
-          .then(function(r){ return r.json(); })
-          .then(function(result){
-            document.getElementById('spinner').classList.remove('active');
-            if (result.success) {
+          .then(function(response) {
+            return response.text().then(function(text) {
+              let payload = null;
+              try {
+                payload = text ? JSON.parse(text) : null;
+              } catch (e) {
+                payload = { success: response.ok, raw: text };
+              }
+              if (!response.ok) {
+                throw new Error(payload && payload.message ? payload.message : ('HTTP ' + response.status));
+              }
+              return payload;
+            });
+          })
+          .then(function(result) {
+            spinner.classList.remove('active');
+            const success = result && (result.success === true || result.status === 'success' || result.ok === true || result.message === 'success');
+            if (success) {
               showScreen('screenSuccess');
             } else {
-              alert('Xəta: ' + (result.message || 'Naməlum'));
+              alert('Ошибка при отправке данных. Проверьте Google Apps Script и доступ по URL.\n\n' + JSON.stringify(result));
             }
           })
-          .catch(function(err){
-            document.getElementById('spinner').classList.remove('active');
-            alert('Şəbəkə xətası.\n' + err.message);
+          .catch(function(err) {
+            spinner.classList.remove('active');
+            console.error('submitData error:', err);
+            alert('Ошибка отправки в Google Sheet.\n' + (err && err.message ? err.message : 'Неизвестная ошибка'));
           });
-
         }).catch(function(err) {
-          document.getElementById('spinner').classList.remove('active');
-          alert('reCAPTCHA xətası. Səhifəni yeniləyin.\n' + err.message);
+          spinner.classList.remove('active');
+          console.error('reCAPTCHA error:', err);
+          alert('reCAPTCHA не удалось выполнить. Обновите страницу.\n' + (err && err.message ? err.message : ''));
         });
       });
     }
@@ -716,7 +621,6 @@
       showScreen('screenLang');
     }
 
-    // Start
     init();
   </script>
 </body>
