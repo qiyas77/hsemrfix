@@ -559,9 +559,9 @@
 
       api: {
         // Вставьте URL развёртывания Apps Script (заканчивается на /exec)
-        googleScriptUrl: 'PASTE_WEB_APP_URL',
+        googleScriptUrl: 'https://script.google.com/macros/s/AKfycbz_ms1wK6xKA20tibzVjoo9HZDIq9kgrpkMSPGuSEhvjIWclVAa_cpxm8RK9RvPjIEcyQ/exec',
         // Вставьте site key reCAPTCHA v3
-        recaptchaSiteKey: 'PASTE_SITE_KEY'
+        recaptchaSiteKey: '6Lcc2uYtAAAAAPZUXUbeHIXVQJo55Lpst816VQZs'
       }
     };
 
@@ -650,13 +650,32 @@
     let isSubmitting = false;
 
     function loadRecaptcha() {
-      const key = CONFIG.api.recaptchaSiteKey;
-      if (!key || key === 'PASTE_SITE_KEY') return;
+      const key = String(CONFIG.api.recaptchaSiteKey || '').trim();
+      if (!key || key === '6Lcc2uYtAAAAAPZUXUbeHIXVQJo55Lpst816VQZs') return;
 
-      const script = document.createElement('script');
-      script.src = 'https://www.google.com/recaptcha/api.js?render=' + encodeURIComponent(key);
-      script.async = true;
-      document.head.appendChild(script);
+      const hosts = [
+        'https://www.google.com/recaptcha/api.js',
+        'https://www.recaptcha.net/recaptcha/api.js'
+      ];
+
+      function load(index) {
+        if (index >= hosts.length) {
+          console.error('reCAPTCHA не загрузилась ни с одного адреса. Проверьте блокировщик или сеть.');
+          return;
+        }
+
+        const script = document.createElement('script');
+        script.src = hosts[index] + '?render=' + encodeURIComponent(key);
+        script.async = true;
+        script.onerror = function() {
+          console.error('Не удалось загрузить:', script.src);
+          script.remove();
+          load(index + 1);
+        };
+        document.head.appendChild(script);
+      }
+
+      load(0);
     }
 
     function init() {
@@ -876,8 +895,8 @@
         return;
       }
 
-      if (CONFIG.api.googleScriptUrl === 'https://script.google.com/macros/s/AKfycbyekw8nbBGp4Ymh1pORVs_jvoOmUypiYfUrwWWhF55wcvwrJh2adWmOxJ7PJ-hTLYS0SQ/exec' ||
-          CONFIG.api.recaptchaSiteKey === '6Lcc2uYtAAAAAPZUXUbeHIXVQJo55Lpst816VQZs') {
+      if (CONFIG.api.googleScriptUrl === 'PASTE_WEB_APP_URL' ||
+          CONFIG.api.recaptchaSiteKey === 'PASTE_SITE_KEY') {
         alert('Не заданы googleScriptUrl и recaptchaSiteKey в CONFIG.');
         return;
       }
