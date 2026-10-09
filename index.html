@@ -328,22 +328,26 @@
 
           console.log('Отправка:', payload);
 
+          const requestBody = JSON.stringify(payload);
+
           fetch(CONFIG.api.googleScriptUrl, {
             method: 'POST',
+            mode: 'cors',
+            credentials: 'omit',
+            cache: 'no-store',
             headers: {
-              'Content-Type': 'application/json',
+              'Content-Type': 'text/plain;charset=UTF-8',
               'Accept': 'application/json, text/plain, */*'
             },
-            body: JSON.stringify(payload)
+            body: requestBody
           })
           .then(function(response) {
             return response.text().then(function(text) {
-              console.log('HTTP:', response.status);
-              console.log('Тело ответа:', text);
+              console.log('HTTP:', response.status, 'Body:', text);
               try {
                 return JSON.parse(text);
               } catch (e) {
-                return { success: response.ok, raw: text };
+                return { success: response.ok, raw: text, status: response.status };
               }
             });
           })
@@ -353,13 +357,14 @@
             if (result && result.success === true) {
               showScreen('screenSuccess');
             } else {
-              alert('Ошибка отправки данных.\n' + (result && result.message ? result.message : 'Проверьте Apps Script и права на таблицу.'));
+              const message = result && result.message ? result.message : 'Проверьте Apps Script, права на таблицу и развертывание Web App.';
+              alert('Ошибка отправки данных.\n' + message + '\n\nЕсли ошибка CORS повторяется, проверьте: 1) Apps Script развернут как Web App, 2) Who has access = Anyone, 3) URL из Deploy вставлен в index.html');
             }
           })
           .catch(function(err) {
             spinner.classList.remove('active');
             console.error('Fetch error:', err);
-            alert('Ошибка сети или Google Apps Script.\n' + (err && err.message ? err.message : 'Неизвестная ошибка'));
+            alert('Ошибка сети или Google Apps Script.\n' + (err && err.message ? err.message : 'Неизвестная ошибка') + '\n\nПроверьте URL Deploy в Apps Script и права доступа Anyone.');
           });
         }).catch(function(err) {
           spinner.classList.remove('active');
