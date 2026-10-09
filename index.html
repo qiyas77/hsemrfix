@@ -5,7 +5,6 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>HSE Welcome System — KARTAŞ KİMYA</title>
 
-  <script src="https://www.google.com/recaptcha/api.js?render=6Lcc2uYtAAAAAPZUXUbeHIXVQJo55Lpst816VQZs"></script>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
 
   <style>
@@ -559,8 +558,7 @@
       ],
 
       api: {
-        googleScriptUrl: 'https://script.google.com/macros/s/AKfycbwqPUIzU2wqnsKvaK8tXiuBrcc5WCP2tajI_jrO-H9Tb_B7KArN5JBzOnRCgbvzsxwqEw/exec',
-        recaptchaSiteKey: '6Lcc2uYtAAAAAPZUXUbeHIXVQJo55Lpst816VQZs'
+        googleScriptUrl: 'https://script.google.com/macros/s/AKfycbwqPUIzU2wqnsKvaK8tXiuBrcc5WCP2tajI_jrO-H9Tb_B7KArN5JBzOnRCgbvzsxwqEw/exec'
       }
     };
 
@@ -870,97 +868,71 @@
         return;
       }
 
-      if (!window.grecaptcha) {
-        alert('reCAPTCHA не загрузился. Обновите страницу.');
-        return;
-      }
-
       isSubmitting = true;
-      setLoading(true, 'Проверка и сохранение...');
+      setLoading(true, 'Сохранение...');
 
-      grecaptcha.ready(function() {
-        grecaptcha.execute(CONFIG.api.recaptchaSiteKey, {
-          action: 'submit'
-        }).then(function(token) {
-          const payload = {
-            firstName: formData.firstName,
-            lastName: formData.lastName,
-            company: formData.company,
-            department: formData.department,
-            lang: formData.lang,
+      const payload = {
+        firstName: formData.firstName,
+        lastName: formData.lastName,
+        company: formData.company,
+        department: formData.department,
+        lang: formData.lang
+      };
 
-            // Передаём все 10 фотографий в одном запросе.
-            instructionPhotos: formData.instructionPhotos.map(function(photo) {
-              return {
-                step: photo.step,
-                url: photo.url,
-                loaded: photo.loaded
-              };
-            }),
+      fetch(CONFIG.api.googleScriptUrl, {
+        method: 'POST',
+        mode: 'cors',
+        credentials: 'omit',
+        cache: 'no-store',
+        headers: {
+          'Content-Type': 'text/plain;charset=UTF-8'
+        },
+        body: JSON.stringify(payload)
+      }).then(function(response) {
+        return response.text().then(function(text) {
+          console.log('HTTP:', response.status);
+          console.log('Ответ сервера:', text);
 
-            recaptchaToken: token
-          };
+          let result;
 
-          console.log('Количество фотографий:', payload.instructionPhotos.length);
-          console.table(payload.instructionPhotos);
+          try {
+            result = JSON.parse(text);
+          } catch (error) {
+            throw new Error(
+              'Сервер вернул не JSON. HTTP ' +
+              response.status + '. Ответ: ' + text.slice(0, 300)
+            );
+          }
 
-          return fetch(CONFIG.api.googleScriptUrl, {
-            method: 'POST',
-            mode: 'cors',
-            credentials: 'omit',
-            cache: 'no-store',
-            headers: {
-              'Content-Type': 'text/plain;charset=UTF-8'
-            },
-            body: JSON.stringify(payload)
-          });
-        }).then(function(response) {
-          if (!response) throw new Error('Пустой ответ сервера.');
+          if (!response.ok) {
+            throw new Error('HTTP ' + response.status);
+          }
 
-          return response.text().then(function(text) {
-            console.log('HTTP:', response.status);
-            console.log('Ответ сервера:', text);
+          if (!result || result.success !== true) {
+            throw new Error(
+              result && result.message
+                ? result.message
+                : 'Сервер не подтвердил регистрацию.'
+            );
+          }
 
-            let result;
-
-            try {
-              result = JSON.parse(text);
-            } catch (error) {
-              throw new Error(
-                'Сервер вернул не JSON. HTTP ' +
-                response.status + '. Ответ: ' + text.slice(0, 300)
-              );
-            }
-
-            if (!response.ok) {
-              throw new Error('HTTP ' + response.status);
-            }
-
-            if (!result || result.success !== true) {
-              throw new Error(
-                result && result.message
-                  ? result.message
-                  : 'Сервер не подтвердил регистрацию.'
-              );
-            }
-
-            return result;
-          });
-        }).then(function() {
-          showScreen('screenSuccess');
-        }).catch(function(error) {
-          console.error('Ошибка отправки:', error);
-
-          alert(
-            'Не удалось завершить регистрацию.\n\n' +
-            (error.message || 'Неизвестная ошибка') +
-            '\n\nПроверьте Google Apps Script, доступ к Web App и журнал ошибок.'
-          );
-        }).finally(function() {
-          isSubmitting = false;
-          setLoading(false);
-          toggleConfirm();
+          return result;
         });
+      }).then(function() {
+        showScreen('screenSuccess');
+      }).catch(function(error) {
+        console.error('Ошибка отправки:', error);
+
+        alert(
+          'Не удалось завершить регистрацию.
+
+' +
+          (error.message || 'Неизвестная ошибка')
+        );
+      }).finally(function() {
+        isSubmitting = false;
+        setLoading(false);
+        toggleConfirm();
       });
     }
 
