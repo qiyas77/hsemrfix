@@ -558,7 +558,10 @@
       ],
 
       api: {
-        googleScriptUrl: 'https://script.google.com/macros/s/AKfycbwqPUIzU2wqnsKvaK8tXiuBrcc5WCP2tajI_jrO-H9Tb_B7KArN5JBzOnRCgbvzsxwqEw/exec'
+        // Вставьте URL развёртывания Apps Script (заканчивается на /exec)
+        googleScriptUrl: 'PASTE_WEB_APP_URL',
+        // Вставьте site key reCAPTCHA v3
+        recaptchaSiteKey: 'PASTE_SITE_KEY'
       }
     };
 
@@ -646,7 +649,18 @@
     let formData = {};
     let isSubmitting = false;
 
+    function loadRecaptcha() {
+      const key = CONFIG.api.recaptchaSiteKey;
+      if (!key || key === 'PASTE_SITE_KEY') return;
+
+      const script = document.createElement('script');
+      script.src = 'https://www.google.com/recaptcha/api.js?render=' + encodeURIComponent(key);
+      script.async = true;
+      document.head.appendChild(script);
+    }
+
     function init() {
+      loadRecaptcha();
       const flagList = document.getElementById('flagList');
       flagList.replaceChildren();
 
@@ -862,75 +876,69 @@
         return;
       }
 
-      if (!formData.instructionPhotos ||
-          formData.instructionPhotos.length !== 10) {
-        alert('Ошибка: список из 10 фотографий не сформирован.');
+      if (CONFIG.api.googleScriptUrl === 'https://script.google.com/macros/s/AKfycbyekw8nbBGp4Ymh1pORVs_jvoOmUypiYfUrwWWhF55wcvwrJh2adWmOxJ7PJ-hTLYS0SQ/exec' ||
+          CONFIG.api.recaptchaSiteKey === '6Lcc2uYtAAAAAPZUXUbeHIXVQJo55Lpst816VQZs') {
+        alert('Не заданы googleScriptUrl и recaptchaSiteKey в CONFIG.');
+        return;
+      }
+
+      if (!window.grecaptcha) {
+        alert('reCAPTCHA не загрузилась. Обновите страницу.');
         return;
       }
 
       isSubmitting = true;
-      setLoading(true, 'Сохранение...');
+      setLoading(true, 'Проверка и сохранение...');
 
-      const payload = {
-        firstName: formData.firstName,
-        lastName: formData.lastName,
-        company: formData.company,
-        department: formData.department,
-        lang: formData.lang
-      };
+      grecaptcha.ready(function() {
+        grecaptcha.execute(CONFIG.api.recaptchaSiteKey, {
+          action: 'submit'
+        }).then(function(token) {
+          return fetch(CONFIG.api.googleScriptUrl, {
+            method: 'POST',
+            mode: 'cors',
+            credentials: 'omit',
+            cache: 'no-store',
+            headers: {
+              'Content-Type': 'text/plain;charset=UTF-8'
+            },
+            body: JSON.stringify({
+              firstName: formData.firstName,
+              lastName: formData.lastName,
+              company: formData.company,
+              department: formData.department,
+              lang: formData.lang,
+              recaptchaToken: token
+            })
+          });
+        }).then(function(response) {
+          return response.text().then(function(text) {
+            let result;
 
-      fetch(CONFIG.api.googleScriptUrl, {
-        method: 'POST',
-        mode: 'cors',
-        credentials: 'omit',
-        cache: 'no-store',
-        headers: {
-          'Content-Type': 'text/plain;charset=UTF-8'
-        },
-        body: JSON.stringify(payload)
-      }).then(function(response) {
-        return response.text().then(function(text) {
-          console.log('HTTP:', response.status);
-          console.log('Ответ сервера:', text);
+            try {
+              result = JSON.parse(text);
+            } catch (error) {
+              throw new Error('Сервер вернул не JSON. HTTP ' + response.status);
+            }
 
-          let result;
-
-          try {
-            result = JSON.parse(text);
-          } catch (error) {
-            throw new Error(
-              'Сервер вернул не JSON. HTTP ' +
-              response.status + '. Ответ: ' + text.slice(0, 300)
-            );
-          }
-
-          if (!response.ok) {
-            throw new Error('HTTP ' + response.status);
-          }
-
-          if (!result || result.success !== true) {
-            throw new Error(
-              result && result.message
-                ? result.message
-                : 'Сервер не подтвердил регистрацию.'
-            );
-          }
-
-          return result;
+            if (!response.ok || !result || result.success !== true) {
+              throw new Error(
+                result && result.message
+                  ? result.message
+                  : 'Сервер не подтвердил регистрацию.'
+              );
+            }
+          });
+        }).then(function() {
+          showScreen('screenSuccess');
+        }).catch(function(error) {
+          console.error('Ошибка отправки:', error);
+          alert('Не удалось завершить регистрацию.\n\n' + (error.message || 'Неизвестная ошибка'));
+        }).finally(function() {
+          isSubmitting = false;
+          setLoading(false);
+          toggleConfirm();
         });
-      }).then(function() {
-        showScreen('screenSuccess');
-      }).catch(function(error) {
-        console.error('Ошибка отправки:', error);
-
-        alert(
-          'Не удалось завершить регистрацию.\n\n' +
-          (error.message || 'Неизвестная ошибка')
-        );
-      }).finally(function() {
-        isSubmitting = false;
-        setLoading(false);
-        toggleConfirm();
       });
     }
 
