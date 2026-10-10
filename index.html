@@ -170,6 +170,63 @@
       display: block;
     }
 
+    .hp-field {
+      position: absolute;
+      left: -9999px;
+      width: 1px;
+      height: 1px;
+      overflow: hidden;
+    }
+
+    .timer-bar {
+      position: fixed;
+      top: 0;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 100%;
+      max-width: 540px;
+      z-index: 100;
+      padding: 10px 16px 12px;
+      background: #fffffff2;
+      backdrop-filter: blur(8px);
+      box-shadow: 0 4px 16px #00000018;
+      text-align: center;
+      font-size: 14px;
+      font-weight: 700;
+      color: #3730a3;
+    }
+
+    .timer-bar[hidden] {
+      display: none;
+    }
+
+    .timer-bar.done {
+      color: #15803d;
+    }
+
+    .timer-track {
+      height: 6px;
+      margin-top: 8px;
+      background: #e2e8f0;
+      border-radius: 3px;
+      overflow: hidden;
+    }
+
+    .timer-fill {
+      width: 0;
+      height: 100%;
+      background: linear-gradient(135deg, #667eea, #764ba2);
+      transition: width .25s linear;
+    }
+
+    .timer-bar.done .timer-fill {
+      background: linear-gradient(135deg, #22c55e, #16a34a);
+    }
+
+    #screenHSE {
+      padding-top: 56px;
+    }
+
     .btn {
       width: 100%;
       padding: 16px;
@@ -398,6 +455,11 @@
 </head>
 
 <body>
+  <div class="timer-bar" id="timerBar" hidden>
+    <div id="timerText"></div>
+    <div class="timer-track"><div class="timer-fill" id="timerFill"></div></div>
+  </div>
+
   <div class="spinner-overlay" id="spinner">
     <div class="spinner"></div>
     <div class="spinner-text" id="spinnerText">Сохранение...</div>
@@ -440,6 +502,11 @@
               <label for="department" id="lblDepartment">Департамент</label>
               <input type="text" id="department" required>
               <div class="error-msg" id="errDepartment"></div>
+            </div>
+
+            <div class="hp-field" aria-hidden="true">
+              <label for="hpFax">Fax</label>
+              <input type="text" id="hpFax" name="fax" tabindex="-1" autocomplete="off">
             </div>
 
             <button type="button" class="btn btn-primary" id="btnContinue" onclick="goToHSE()">Продолжить</button>
@@ -557,6 +624,10 @@
         }
       ],
 
+      security: {
+        minReadMs: 30000
+      },
+
       api: {
         // Вставьте URL развёртывания Apps Script (заканчивается на /exec)
         googleScriptUrl: 'https://script.google.com/macros/s/AKfycbxXgSdd54fVtfhSCIUvOKw-1ts9N6u_xdFZZmgJ9VJ8aKDdvVumscfs0x9EtKpEUV0ldQ/exec'
@@ -581,7 +652,11 @@
         successTitle:'Qeydiyyat tamamlandı!',
         btnNewReg:'Yeni qeydiyyat',
         errRequired:'Bu sahə tələb olunur',
-        errMinLength:'Ən azı 2 simvol daxil edin'
+        errMinLength:'Ən azı 2 simvol daxil edin',
+        errTooFast:'Təhlükəsizlik təlimatını oxuyun, sonra təsdiqləyin',
+        timerWait:'Təlimatı oxuyun: {s} san. qalıb',
+        timerDone:'Qeydiyyatı indi təsdiqləyə bilərsiniz',
+        alreadyTitle:'Siz artıq təlimatdan keçmisiniz. Təkrar qeydiyyat tələb olunmur'
       },
       TR: {
         formTitle:'Ziyaretçi Kaydı',
@@ -600,7 +675,11 @@
         successTitle:'Kayıt tamamlandı!',
         btnNewReg:'Yeni kayıt',
         errRequired:'Bu alan zorunludur',
-        errMinLength:'En az 2 karakter girin'
+        errMinLength:'En az 2 karakter girin',
+        errTooFast:'Lütfen onaylamadan önce güvenlik eğitimini okuyun',
+        timerWait:'Eğitimi okuyun: {s} sn kaldı',
+        timerDone:'Artık kaydı onaylayabilirsiniz',
+        alreadyTitle:'Eğitimi zaten tamamladınız. Tekrar kayıt gerekmiyor'
       },
       RU: {
         formTitle:'Регистрация посетителя',
@@ -619,7 +698,11 @@
         successTitle:'Регистрация завершена!',
         btnNewReg:'Новая регистрация',
         errRequired:'Это поле обязательно',
-        errMinLength:'Введите минимум 2 символа'
+        errMinLength:'Введите минимум 2 символа',
+        errTooFast:'Пожалуйста, ознакомьтесь с инструктажем перед подтверждением',
+        timerWait:'Изучите инструктаж: осталось {s} сек.',
+        timerDone:'Теперь можно подтвердить регистрацию',
+        alreadyTitle:'Вы уже прошли инструктаж. Повторная регистрация не требуется'
       },
       EN: {
         formTitle:'Visitor Registration',
@@ -638,7 +721,11 @@
         successTitle:'Registration Complete!',
         btnNewReg:'New Registration',
         errRequired:'This field is required',
-        errMinLength:'Please enter at least 2 characters'
+        errMinLength:'Please enter at least 2 characters',
+        errTooFast:'Please read the safety briefing before confirming',
+        timerWait:'Study the briefing: {s} sec left',
+        timerDone:'You can now confirm registration',
+        alreadyTitle:'You have already completed the briefing. No re-registration required'
       }
     };
 
@@ -646,6 +733,7 @@
     let currentLangConfig = null;
     let formData = {};
     let isSubmitting = false;
+    let hseShownAt = 0;
 
     function init() {
       const flagList = document.getElementById('flagList');
@@ -706,6 +794,8 @@
 
       const target = document.getElementById(id);
       if (target) target.classList.add('active');
+
+      if (id !== 'screenHSE') stopTimer();
 
       window.scrollTo(0, 0);
     }
@@ -839,11 +929,60 @@
       document.getElementById('hseCheck').checked = false;
       toggleConfirm();
       showScreen('screenHSE');
+      startTimer();
+    }
+
+    let timerId = null;
+
+    function readSecondsLeft() {
+      if (!hseShownAt) return 0;
+
+      return Math.max(
+        0,
+        Math.ceil((CONFIG.security.minReadMs - (Date.now() - hseShownAt)) / 1000)
+      );
+    }
+
+    function stopTimer() {
+      if (timerId !== null) {
+        clearInterval(timerId);
+        timerId = null;
+      }
+
+      document.getElementById('timerBar').hidden = true;
+    }
+
+    function updateTimer() {
+      const t = i18n[currentLang];
+      const left = readSecondsLeft();
+      const progress = Math.min(1, (Date.now() - hseShownAt) / CONFIG.security.minReadMs);
+
+      document.getElementById('timerFill').style.width = (progress * 100) + '%';
+      document.getElementById('timerText').textContent =
+        left > 0 ? t.timerWait.replace('{s}', left) : t.timerDone;
+      document.getElementById('timerBar').classList.toggle('done', left === 0);
+
+      toggleConfirm();
+
+      if (left === 0 && timerId !== null) {
+        clearInterval(timerId);
+        timerId = null;
+      }
+    }
+
+    function startTimer() {
+      stopTimer();
+      hseShownAt = Date.now();
+      document.getElementById('timerBar').hidden = false;
+      updateTimer();
+      timerId = setInterval(updateTimer, 250);
     }
 
     function toggleConfirm() {
       document.getElementById('btnConfirm').disabled =
-        !document.getElementById('hseCheck').checked || isSubmitting;
+        !document.getElementById('hseCheck').checked ||
+        isSubmitting ||
+        readSecondsLeft() > 0;
     }
 
     function setLoading(loading, message) {
@@ -851,8 +990,7 @@
         message || 'Сохранение...';
 
       document.getElementById('spinner').classList.toggle('active', loading);
-      document.getElementById('btnConfirm').disabled =
-        loading || !document.getElementById('hseCheck').checked;
+      toggleConfirm();
     }
 
     function submitData() {
@@ -860,6 +998,13 @@
 
       if (!document.getElementById('hseCheck').checked) {
         alert(i18n[currentLang].lblHseCheck);
+        return;
+      }
+
+      const elapsedMs = Date.now() - hseShownAt;
+
+      if (elapsedMs < CONFIG.security.minReadMs) {
+        alert(i18n[currentLang].errTooFast);
         return;
       }
 
@@ -884,7 +1029,9 @@
           lastName: formData.lastName,
           company: formData.company,
           department: formData.department,
-          lang: formData.lang
+          lang: formData.lang,
+          fax: document.getElementById('hpFax').value,
+          elapsedMs: elapsedMs
         })
       }).then(function(response) {
         return response.text().then(function(text) {
@@ -903,8 +1050,14 @@
                 : 'Сервер не подтвердил регистрацию.'
             );
           }
+
+          return result;
         });
-      }).then(function() {
+      }).then(function(result) {
+        const t = i18n[currentLang];
+
+        document.getElementById('successTitle').textContent =
+          result.duplicate ? t.alreadyTitle : t.successTitle;
         showScreen('screenSuccess');
       }).catch(function(error) {
         console.error('Ошибка отправки:', error);
